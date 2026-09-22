@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Feasto - Super Admin Control Center</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <link rel="apple-touch-icon" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col justify-between antialiased selection:bg-orange-500 selection:text-white">
+
+  <!-- Header with 3-Lines (Hamburger) Dropdown -->
+  <header class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center sticky top-0 z-50 shadow-md">
+    <div id="adminBrand"></div>
+
+    <!-- 3-Lines Options Button -->
+    <div class="relative">
+      <button id="menuToggleBtn" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-white hover:bg-slate-700 transition">
+        <i class="fas fa-bars text-base"></i>
+      </button>
+
+      <!-- 3-Lines Dropdown Menu with Interlinking -->
+      <div id="adminDropdown" class="hidden absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-2 space-y-1 z-50">
+        <button onclick="showSection('secDashboard')" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-700 flex items-center transition">
+          <i class="fas fa-chart-pie w-6 text-orange-400"></i> Dashboard
+        </button>
+        <button onclick="showSection('secDishApproval')" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-700 flex items-center transition">
+          <i class="fas fa-bowl-food w-6 text-amber-400"></i> Approve Dishes
+        </button>
+        <button onclick="showSection('secBanners')" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-700 flex items-center transition">
+          <i class="fas fa-images w-6 text-blue-400"></i> Promotional Banners
+        </button>
+        <button onclick="showSection('secRests')" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-700 flex items-center transition">
+          <i class="fas fa-store w-6 text-emerald-400"></i> Partner Applications
+        </button>
+        <button onclick="showSection('secOrders')" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-700 flex items-center transition">
+          <i class="fas fa-burger w-6 text-purple-400"></i> Live Orders Monitor
+        </button>
+
+        <!-- Jump directly to other panels -->
+        <div class="border-t border-slate-700 pt-2 mt-1">
+          <span class="text-[9px] uppercase tracking-wider text-slate-500 font-bold px-3">Switch Panels</span>
+          <a href="customer.html" class="block px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700">
+            <i class="fas fa-mobile-screen mr-2 text-orange-400"></i> Open Customer App
+          </a>
+          <a href="restaurant.html" class="block px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700">
+            <i class="fas fa-store mr-2 text-emerald-400"></i> Open Kitchen Panel
+          </a>
+          <a href="delivery.html" class="block px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700">
+            <i class="fas fa-motorcycle mr-2 text-blue-400"></i> Open Rider App
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Work Surface -->
+  <main class="p-4 md:p-6 max-w-5xl mx-auto w-full flex-1 space-y-6">
+
+    <!-- 1. DASHBOARD OVERVIEW -->
+    <section id="secDashboard" class="space-y-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-xl md:text-2xl font-black text-white">System Overview</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Real-time status of orders, partners, and pending tasks</p>
+        </div>
+        <span class="text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full font-bold">
+          ADMIN ONLINE
+        </span>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+          <span class="text-[11px] text-slate-400 font-bold block">Total Orders</span>
+          <span id="statOrders" class="text-2xl md:text-3xl font-black text-white mt-1 block">0</span>
+        </div>
+        <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+          <span class="text-[11px] text-amber-400 font-bold block">Dishes to Approve</span>
+          <span id="statDishes" class="text-2xl md:text-3xl font-black text-amber-400 mt-1 block">0</span>
+        </div>
+        <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+          <span class="text-[11px] text-blue-400 font-bold block">Active Banners</span>
+          <span id="statBanners" class="text-2xl md:text-3xl font-black text-blue-400 mt-1 block">0</span>
+        </div>
+        <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+          <span class="text-[11px] text-emerald-400 font-bold block">Partner Requests</span>
+          <span id="statApps" class="text-2xl md:text-3xl font-black text-emerald-400 mt-1 block">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. DISH APPROVAL SECTION -->
+    <section id="secDishApproval" class="hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-lg md:text-xl font-black text-white">Dishes Awaiting Approval</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Approved dishes become immediately visible in Customer Panel</p>
+        </div>
+        <button onclick="showSection('secDashboard')" class="text-xs text-slate-400 hover:text-white font-bold">
+          <i class="fas fa-arrow-left mr-1"></i> Back
+        </button>
+      </div>
+      <div id="dishApprovalList" class="space-y-3">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- 3. PROMOTIONAL BANNERS SECTION -->
+    <section id="secBanners" class="hidden space-y-5">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-lg md:text-xl font-black text-white">Promotional Banners</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Publish banners to customer home page by image URL</p>
+        </div>
+        <button onclick="showSection('secDashboard')" class="text-xs text-slate-400 hover:text-white font-bold">
+          <i class="fas fa-arrow-left mr-1"></i> Back
+        </button>
+      </div>
+
+      <form id="bannerForm" class="bg-slate-800 p-4 md:p-5 rounded-2xl border border-slate-700 space-y-3">
+        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Publish New Banner</h4>
+        <div>
+          <label class="text-[11px] text-slate-400 font-bold block mb-1">Banner Title</label>
+          <input type="text" id="bannerTitle" placeholder="e.g. Special Feast - 20% OFF" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
+        </div>
+        <div>
+          <label class="text-[11px] text-slate-400 font-bold block mb-1">Image Web Link</label>
+          <input type="url" id="bannerUrl" placeholder="https://images.unsplash.com/..." required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
+        </div>
+        <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition">
+          <i class="fas fa-cloud-arrow-up mr-1.5"></i> Publish Banner
+        </button>
+      </form>
+
+      <div>
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Live Active Banners</h4>
+        <div id="adminBannersList" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Live banners -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. PARTNER APPLICATIONS SECTION -->
+    <section id="secRests" class="hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-lg md:text-xl font-black text-white">Partner Applications</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Approving adds the restaurant live to customer application</p>
+        </div>
+        <button onclick="showSection('secDashboard')" class="text-xs text-slate-400 hover:text-white font-bold">
+          <i class="fas fa-arrow-left mr-1"></i> Back
+        </button>
+      </div>
+      <div id="adminRestsList" class="space-y-3"></div>
+    </section>
+
+    <!-- 5. LIVE ORDERS MONITOR SECTION -->
+    <section id="secOrders" class="hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-lg md:text-xl font-black text-white">Live Orders Monitor</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Real-time status of all customer orders in the system</p>
+        </div>
+        <button onclick="showSection('secDashboard')" class="text-xs text-slate-400 hover:text-white font-bold">
+          <i class="fas fa-arrow-left mr-1"></i> Back
+        </button>
+      </div>
+
+      <div class="bg-slate-800/80 rounded-2xl border border-slate-700 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-950 text-slate-400 font-mono uppercase text-[10px]">
+              <tr>
+                <th class="p-3">Order ID</th>
+                <th class="p-3">Kitchen</th>
+                <th class="p-3">Total</th>
+                <th class="p-3">Status</th>
+                <th class="p-3">Payment</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody" class="divide-y divide-slate-700">
+              <!-- Live orders -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="p-4 text-center text-xs text-slate-600 border-t border-slate-800">
+    Feasto Master Admin Control Panel &bull; Powered by Firebase Firestore Real-Time Sync
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, setDoc, addDoc, deleteDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+    import { CONFIG, BRAND_LOGO_HTML } from "./config.js";
+
+    document.getElementById("adminBrand").innerHTML = BRAND_LOGO_HTML;
+
+    const app = initializeApp(CONFIG.firebase);
+    const db = getFirestore(app);
+
+    const menuToggleBtn = document.getElementById("menuToggleBtn");
+    const adminDropdown = document.getElementById("adminDropdown");
+    menuToggleBtn.onclick = (e) => {
+      e.stopPropagation();
+      adminDropdown.classList.toggle("hidden");
+    };
+
+    document.addEventListener("click", (e) => {
+      if (!adminDropdown.contains(e.target) && e.target !== menuToggleBtn) {
+        adminDropdown.classList.add("hidden");
+      }
+    });
+
+    window.showSection = (secId) => {
+      ["secDashboard", "secDishApproval", "secBanners", "secRests", "secOrders"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add("hidden");
+      });
+      const target = document.getElementById(secId);
+      if (target) target.classList.remove("hidden");
+      adminDropdown.classList.add("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // 1. Listen for Pending Dishes
+    onSnapshot(query(collection(db, "dishes"), where("status", "==", "PENDING_APPROVAL")), (snap) => {
+      document.getElementById("statDishes").innerText = snap.size;
+      const list = document.getElementById("dishApprovalList");
+      list.innerHTML = "";
+
+      if (snap.empty) {
+        list.innerHTML = `
+          <div class="p-8 bg-slate-800/60 rounded-2xl border border-dashed border-slate-700 text-center text-xs text-slate-500">
+            No dishes pending approval right now.
+          </div>`;
+        return;
+      }
+
+      snap.forEach(d => {
+        const dish = d.data();
+        const card = document.createElement("div");
+        card.className = "bg-slate-800 p-3.5 md:p-4 rounded-2xl border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3";
+        card.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <img src="${dish.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120'}" class="w-14 h-14 object-cover rounded-xl border border-slate-700 flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120'">
+            <div>
+              <h4 class="font-bold text-sm text-white">${dish.name}</h4>
+              <div class="flex items-center space-x-2 text-xs text-slate-400 mt-0.5">
+                <span class="font-mono text-emerald-400 font-bold">₹${dish.price}</span>
+                <span>&bull;</span>
+                <span class="font-mono text-[11px] truncate max-w-[140px]">Kitchen: ${dish.restaurantId || 'Partner'}</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex space-x-2 self-end sm:self-center">
+            <button id="appr-${d.id}" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-xs">
+              <i class="fas fa-check mr-1"></i> Approve
+            </button>
+            <button id="rej-${d.id}" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 font-bold text-xs px-3 py-2 rounded-xl transition">
+              <i class="fas fa-xmark mr-1"></i> Reject
+            </button>
+          </div>
+        `;
+
+        card.querySelector(`#appr-${d.id}`).onclick = async () => {
+          await updateDoc(doc(db, "dishes", d.id), { status: "APPROVED" });
+        };
+
+        card.querySelector(`#rej-${d.id}`).onclick = async () => {
+          if (confirm(`Reject and delete "${dish.name}"?`)) {
+            await deleteDoc(doc(db, "dishes", d.id));
+          }
+        };
+
+        list.appendChild(card);
+      });
+    });
+
+    // 2. Banner Management
+    document.getElementById("bannerForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("bannerTitle").value.trim();
+      const imageUrl = document.getElementById("bannerUrl").value.trim();
+
+      try {
+        await addDoc(collection(db, "banners"), {
+          title: title,
+          imageUrl: imageUrl,
+          createdAt: serverTimestamp()
+        });
+        document.getElementById("bannerForm").reset();
+        alert("Banner published live to customer home screen!");
+      } catch (err) {
+        alert("Error adding banner: " + err.message);
+      }
+    };
+
+    onSnapshot(collection(db, "banners"), (snap) => {
+      document.getElementById("statBanners").innerText = snap.size;
+      const bList = document.getElementById("adminBannersList");
+      bList.innerHTML = "";
+
+      if (snap.empty) {
+        bList.innerHTML = `
+          <div class="col-span-full p-6 bg-slate-800/60 rounded-2xl border border-dashed border-slate-700 text-center text-xs text-slate-500">
+            No promotional banners added yet. Use the form above to publish one.
+          </div>`;
+        return;
+      }
+
+      snap.forEach(d => {
+        const b = d.data();
+        const card = document.createElement("div");
+        card.className = "bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 relative shadow-sm";
+        card.innerHTML = `
+          <div class="h-28 w-full bg-slate-900 overflow-hidden relative">
+            <img src="${b.imageUrl}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600'">
+          </div>
+          <div class="p-3 flex justify-between items-center bg-slate-800">
+            <span class="text-xs font-bold text-white truncate max-w-[200px]">${b.title}</span>
+            <button id="del-ban-${d.id}" class="text-rose-400 hover:text-rose-300 text-xs font-bold p-1">
+              <i class="fas fa-trash-can mr-1"></i> Delete
+            </button>
+          </div>
+        `;
+        card.querySelector(`#del-ban-${d.id}`).onclick = async () => {
+          if (confirm("Remove this banner from customer app?")) {
+            await deleteDoc(doc(db, "banners", d.id));
+          }
+        };
+        bList.appendChild(card);
+      });
+    });
+
+    // 3. Partner Onboarding Applications
+    onSnapshot(collection(db, "restaurantApplications"), (snap) => {
+      let pending = 0;
+      const list = document.getElementById("adminRestsList");
+      list.innerHTML = "";
+
+      snap.forEach(docSnap => {
+        const appData = docSnap.data();
+        if (appData.status === "PENDING") {
+          pending++;
+          const card = document.createElement("div");
+          card.className = "bg-slate-800 p-4 rounded-2xl border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3";
+          card.innerHTML = `
+            <div>
+              <h4 class="font-bold text-white text-sm">${appData.restaurantName}</h4>
+              <p class="text-xs text-slate-400 mt-0.5">Owner: ${appData.ownerName} &bull; 📞 ${appData.phone}</p>
+              <span class="inline-block text-[10px] text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded font-mono mt-1">
+                ${appData.cuisine || 'Multi-Cuisine'}
+              </span>
+            </div>
+            <div class="flex space-x-2 self-end sm:self-center">
+              <button id="appr-rest-${docSnap.id}" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-xs">
+                <i class="fas fa-check mr-1"></i> Approve
+              </button>
+              <button id="rej-rest-${docSnap.id}" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 font-bold text-xs px-3 py-2 rounded-xl transition">
+                <i class="fas fa-xmark mr-1"></i> Reject
+              </button>
+            </div>
+          `;
+
+          card.querySelector(`#appr-rest-${docSnap.id}`).onclick = async () => {
+            await updateDoc(doc(db, "restaurantApplications", docSnap.id), { status: "APPROVED" });
+            await setDoc(doc(db, "restaurants", docSnap.id), {
+              name: appData.restaurantName,
+              owner: appData.ownerName,
+              phone: appData.phone,
+              cuisine: appData.cuisine || "Multi-Cuisine",
+              status: "APPROVED",
+              lat: 28.6139,
+              lng: 77.2090,
+              rating: 4.8,
+              createdAt: serverTimestamp()
+            });
+            alert(`Approved ${appData.restaurantName}! It is now visible in Customer App.`);
+          };
+
+          card.querySelector(`#rej-rest-${docSnap.id}`).onclick = async () => {
+            await updateDoc(doc(db, "restaurantApplications", docSnap.id), { status: "REJECTED" });
+          };
+
+          list.appendChild(card);
+        }
+      });
+
+      document.getElementById("statApps").innerText = pending;
+      if (pending === 0) {
+        list.innerHTML = `
+          <div class="p-8 bg-slate-800/60 rounded-2xl border border-dashed border-slate-700 text-center text-xs text-slate-500">
+            No pending partner onboarding requests.
+          </div>`;
+      }
+    });
+
+    // 4. Live System Orders Monitor
+    onSnapshot(collection(db, "orders"), (snap) => {
+      document.getElementById("statOrders").innerText = snap.size;
+      const tbody = document.getElementById("ordersTableBody");
+      tbody.innerHTML = "";
+
+      if (snap.empty) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-xs text-slate-500">No customer orders placed yet.</td></tr>`;
+        return;
+      }
+
+      snap.forEach(docSnap => {
+        const o = docSnap.data();
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-800/40 transition";
+        tr.innerHTML = `
+          <td class="p-3 font-mono text-[11px] text-slate-400">#${docSnap.id.substring(0, 6)}</td>
+          <td class="p-3 font-bold text-white text-xs">${o.restaurantName || o.restaurantId || 'Kitchen'}</td>
+          <td class="p-3 font-mono font-bold text-xs text-slate-200">₹${o.totalAmount || 0}</td>
+          <td class="p-3">
+            <span class="bg-slate-900 border border-slate-700 text-orange-400 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+              ${o.status || 'CREATED'}
+            </span>
+          </td>
+          <td class="p-3 text-[11px] font-semibold ${o.paymentStatus === 'SUCCESS' ? 'text-emerald-400' : 'text-slate-400'}">
+            ${o.paymentStatus || 'PENDING'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+  </script>
+</body>
+</html>
