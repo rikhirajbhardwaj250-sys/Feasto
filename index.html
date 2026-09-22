@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Feasto - Food Delivery Platform</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <link rel="apple-touch-icon" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <meta name="theme-color" content="#0F172A">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-orange-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="p-4 border-b border-slate-800 max-w-5xl mx-auto w-full flex justify-between items-center">
+    <div id="brandLogo"></div>
+    <span class="text-[10px] bg-orange-500/20 text-orange-400 border border-orange-500/30 px-3 py-1 rounded-full font-bold font-mono">
+      4 PANELS CONNECTED
+    </span>
+  </header>
+
+  <!-- Panel Cards Grid -->
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-1 flex flex-col justify-center w-full">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl md:text-5xl font-black mb-2 text-white">Feasto Ecosystem</h1>
+      <p class="text-slate-400 text-xs md:text-sm max-w-md mx-auto">
+        Select a portal below. All panels communicate in real time through your Firebase Firestore database.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <a href="customer.html" class="bg-slate-800/90 border border-slate-700 hover:border-orange-500 p-5 rounded-3xl flex items-center space-x-4 shadow-lg transition transform active:scale-95">
+        <div class="w-12 h-12 bg-orange-500/20 text-orange-500 rounded-2xl flex items-center justify-center text-xl flex-shrink-0">
+          <i class="fas fa-utensils"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center">Customer App <i class="fas fa-arrow-right ml-2 text-xs text-orange-400"></i></h2>
+          <p class="text-xs text-slate-400 mt-0.5">Order food, pay via UPI, live map tracking & OTP.</p>
+        </div>
+      </a>
+
+      <a href="restaurant.html" class="bg-slate-800/90 border border-slate-700 hover:border-emerald-500 p-5 rounded-3xl flex items-center space-x-4 shadow-lg transition transform active:scale-95">
+        <div class="w-12 h-12 bg-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-center text-xl flex-shrink-0">
+          <i class="fas fa-store"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center">Kitchen Panel <i class="fas fa-arrow-right ml-2 text-xs text-emerald-400"></i></h2>
+          <p class="text-xs text-slate-400 mt-0.5">Accept orders, submit dishes for admin approval.</p>
+        </div>
+      </a>
+
+      <a href="delivery.html" class="bg-slate-800/90 border border-slate-700 hover:border-blue-500 p-5 rounded-3xl flex items-center space-x-4 shadow-lg transition transform active:scale-95">
+        <div class="w-12 h-12 bg-blue-500/20 text-blue-500 rounded-2xl flex items-center justify-center text-xl flex-shrink-0">
+          <i class="fas fa-motorcycle"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center">Rider Panel <i class="fas fa-arrow-right ml-2 text-xs text-blue-400"></i></h2>
+          <p class="text-xs text-slate-400 mt-0.5">Automated payout calculator, call customer & OTP verify.</p>
+        </div>
+      </a>
+
+      <a href="admin.html" class="bg-slate-800/90 border border-slate-700 hover:border-purple-500 p-5 rounded-3xl flex items-center space-x-4 shadow-lg transition transform active:scale-95">
+        <div class="w-12 h-12 bg-purple-500/20 text-purple-500 rounded-2xl flex items-center justify-center text-xl flex-shrink-0">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center">Master Admin <i class="fas fa-arrow-right ml-2 text-xs text-purple-400"></i></h2>
+          <p class="text-xs text-slate-400 mt-0.5">Approve dishes, publish banners, manage partners.</p>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <footer class="p-4 text-center text-slate-500 text-xs border-t border-slate-800">
+    Feasto &copy; 2026 &bull; Good Food. Delivered Fast.
+  </footer>
+
+  <script type="module">
+    import { BRAND_LOGO_HTML } from "./config.js";
+    document.getElementById("brandLogo").innerHTML = BRAND_LOGO_HTML;
+  </script>
+</body>
+</html>
