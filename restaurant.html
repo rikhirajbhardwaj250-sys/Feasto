@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Feasto - Restaurant Portal</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <link rel="apple-touch-icon" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .pb-safe { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans pb-safe">
+
+  <!-- Instant Partner Login Box (No manual console work required) -->
+  <div id="loginSection" class="max-w-md mx-auto min-h-screen flex flex-col justify-center p-6">
+    <div class="text-center mb-6" id="brandBox"></div>
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
+      <h3 class="text-base font-black text-slate-900">Kitchen Partner Login</h3>
+      <p class="text-xs text-slate-500">Enter your Partner ID or Phone Number to access dashboard</p>
+      <div>
+        <label class="text-xs font-bold text-slate-600 block mb-1">Partner ID / Phone</label>
+        <input type="text" id="partnerLoginInput" value="DEMO_REST_1" class="w-full border rounded-xl p-3 text-xs focus:ring-2 focus:ring-orange-500">
+      </div>
+      <button id="loginBtn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider transition">
+        Enter Kitchen Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Kitchen Dashboard -->
+  <div id="mainDashboard" class="hidden min-h-screen flex flex-col">
+    <header class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-30 shadow-xs">
+      <div id="dashBrand"></div>
+      <div class="flex items-center space-x-3">
+        <button id="openAddDishBtn" class="bg-orange-500 hover:bg-orange-600 text-white text-xs font-black px-3.5 py-2 rounded-xl flex items-center shadow-xs">
+          <i class="fas fa-plus mr-1.5"></i> Add Dish
+        </button>
+        <button id="logoutBtn" class="text-xs font-bold text-slate-400 hover:text-slate-700">Exit</button>
+      </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 w-full space-y-4 flex-1">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-lg font-black text-slate-900">Live Kitchen Orders</h2>
+          <p class="text-xs text-slate-500">Manage orders and notify delivery partners</p>
+        </div>
+        <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded-full flex items-center">
+          <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse mr-2"></span> Kitchen Online
+        </span>
+      </div>
+
+      <div id="ordersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Live orders stream -->
+      </div>
+    </main>
+
+    <!-- Interlinked Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-2 flex justify-around items-center z-40 shadow-lg">
+      <a href="customer.html" class="text-slate-400 hover:text-slate-700 flex flex-col items-center flex-1">
+        <i class="fas fa-utensils text-lg"></i>
+        <span class="text-[9px] font-bold mt-0.5">Customer</span>
+      </a>
+      <a href="restaurant.html" class="text-emerald-600 flex flex-col items-center flex-1">
+        <i class="fas fa-store text-lg"></i>
+        <span class="text-[9px] font-bold mt-0.5">Kitchen</span>
+      </a>
+      <a href="delivery.html" class="text-slate-400 hover:text-slate-700 flex flex-col items-center flex-1">
+        <i class="fas fa-person-biking text-lg"></i>
+        <span class="text-[9px] font-bold mt-0.5">Rider</span>
+      </a>
+      <a href="admin.html" class="text-slate-400 hover:text-slate-700 flex flex-col items-center flex-1">
+        <i class="fas fa-shield-halved text-lg"></i>
+        <span class="text-[9px] font-bold mt-0.5">Admin</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Add Dish Modal (Sent to Admin for Approval) -->
+  <div id="addDishModal" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-md w-full space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h4 class="font-black text-slate-900 text-base">Add New Menu Dish</h4>
+        <button id="closeDishModalBtn" class="text-slate-400"><i class="fas fa-xmark text-lg"></i></button>
+      </div>
+      <p class="text-xs text-orange-600 font-bold">
+        <i class="fas fa-info-circle mr-1"></i> Dish will appear in Customer Panel once approved by Admin.
+      </p>
+      <form id="dishForm" class="space-y-3">
+        <div>
+          <label class="text-xs font-bold block mb-1">Dish Name</label>
+          <input type="text" id="dishName" required placeholder="e.g. Special Chicken Curry" class="w-full border rounded-xl p-2.5 text-xs">
+        </div>
+        <div>
+          <label class="text-xs font-bold block mb-1">Price (₹)</label>
+          <input type="number" id="dishPrice" required placeholder="220" class="w-full border rounded-xl p-2.5 text-xs">
+        </div>
+        <div>
+          <label class="text-xs font-bold block mb-1">Image URL (Web Link)</label>
+          <input type="url" id="dishImageUrl" placeholder="https://images.unsplash.com/..." class="w-full border rounded-xl p-2.5 text-xs">
+        </div>
+        <button type="submit" class="w-full bg-slate-900 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider">
+          Submit for Admin Approval
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+    import { CONFIG, BRAND_LOGO_HTML } from "./config.js";
+
+    document.getElementById("brandBox").innerHTML = BRAND_LOGO_HTML;
+    document.getElementById("dashBrand").innerHTML = BRAND_LOGO_HTML;
+
+    const app = initializeApp(CONFIG.firebase);
+    const db = getFirestore(app);
+
+    let activeRestId = localStorage.getItem("feasto_rest_id");
+    if (activeRestId) showDashboard();
+
+    document.getElementById("loginBtn").onclick = () => {
+      activeRestId = document.getElementById("partnerLoginInput").value.trim() || "DEMO_REST_1";
+      localStorage.setItem("feasto_rest_id", activeRestId);
+      showDashboard();
+    };
+
+    document.getElementById("logoutBtn").onclick = () => {
+      localStorage.removeItem("feasto_rest_id");
+      location.reload();
+    };
+
+    function showDashboard() {
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("mainDashboard").classList.remove("hidden");
+
+      const q = query(collection(db, "orders"), where("restaurantId", "==", activeRestId));
+      onSnapshot(q, (snap) => {
+        const grid = document.getElementById("ordersGrid");
+        grid.innerHTML = "";
+        if (snap.empty) {
+          grid.innerHTML = `<div class="p-8 bg-white border border-dashed rounded-3xl text-center text-xs text-slate-400 col-span-2">No active orders right now.</div>`;
+          return;
+        }
+
+        snap.forEach(docSnap => {
+          const ord = docSnap.data();
+          const ordId = docSnap.id;
+          const card = document.createElement("div");
+          card.className = "bg-white p-5 rounded-3xl border border-slate-200 shadow-xs relative space-y-3";
+
+          if (ord.status === "CREATED") {
+            card.innerHTML = `
+              <div class="flex justify-between items-center">
+                <span class="bg-orange-100 text-orange-800 text-[10px] font-black px-2 py-0.5 rounded">NEW INCOMING</span>
+                <span class="text-xs font-mono text-slate-400">#${ordId.substring(0,6)}</span>
+              </div>
+              <h4 class="font-black text-slate-900 text-base">Total: ₹${ord.totalAmount}</h4>
+              <p class="text-xs text-slate-500">${ord.items?.length || 0} items</p>
+              <div class="flex space-x-2 pt-2">
+                <button id="acc-${ordId}" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs py-2.5 rounded-xl">ACCEPT ORDER</button>
+                <button id="rej-${ordId}" class="flex-1 bg-rose-50 text-rose-600 font-bold text-xs py-2.5 rounded-xl">REJECT</button>
+              </div>
+            `;
+            card.querySelector(`#acc-${ordId}`).onclick = () => updateDoc(doc(db, "orders", ordId), { status: "RESTAURANT_ACCEPTED" });
+            card.querySelector(`#rej-${ordId}`).onclick = () => updateDoc(doc(db, "orders", ordId), { status: "RESTAURANT_REJECTED" });
+          } else if (ord.status === "PAYMENT_CONFIRMED") {
+            card.innerHTML = `
+              <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl">
+                <h5 class="font-black text-emerald-800 text-sm"><i class="fas fa-circle-check mr-1.5"></i> You can start cooking!</h5>
+                <p class="text-[11px] text-emerald-700 mt-0.5">UPI Payment confirmed by customer.</p>
+              </div>
+              <button id="rdy-${ordId}" class="w-full bg-slate-900 hover:bg-black text-white font-black text-xs py-3 rounded-xl uppercase tracking-wider">
+                Mark Food Ready for Pickup
+              </button>
+            `;
+            card.querySelector(`#rdy-${ordId}`).onclick = () => updateDoc(doc(db, "orders", ordId), { status: "READY_FOR_PICKUP" });
+          } else {
+            card.innerHTML = `
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-bold text-slate-700">Order #${ordId.substring(0,6)}</span>
+                <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">${ord.status}</span>
+              </div>
+            `;
+          }
+          grid.appendChild(card);
+        });
+      });
+    }
+
+    document.getElementById("openAddDishBtn").onclick = () => document.getElementById("addDishModal").classList.remove("hidden");
+    document.getElementById("closeDishModalBtn").onclick = () => document.getElementById("addDishModal").classList.add("hidden");
+
+    document.getElementById("dishForm").onsubmit = async (e) => {
+      e.preventDefault();
+      await addDoc(collection(db, "dishes"), {
+        restaurantId: activeRestId,
+        name: document.getElementById("dishName").value,
+        price: Number(document.getElementById("dishPrice").value),
+        imageUrl: document.getElementById("dishImageUrl").value || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400",
+        status: "PENDING_APPROVAL",
+        createdAt: serverTimestamp()
+      });
+      alert("Dish submitted! Waiting for Admin verification.");
+      document.getElementById("dishForm").reset();
+      document.getElementById("addDishModal").classList.add("hidden");
+    };
+  </script>
+</body>
+</html>
