@@ -1,0 +1,8 @@
+#Specific rules for each independent panel MUST come first
+/customer.html    /customer.html    200
+/restaurant.html  /restaurant.html  200
+/delivery.html    /delivery.html    200
+/admin.html       /admin.html       200
+
+# Root fallback
+/                 /index.html       200
