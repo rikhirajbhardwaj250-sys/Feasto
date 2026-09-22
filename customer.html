@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Feasto - Good Food. Delivered Fast.</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <link rel="apple-touch-icon" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <meta name="theme-color" content="#EA580C">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    .pb-safe { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+    #trackingMap { height: 230px; width: 100%; border-radius: 1rem; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 pb-safe font-sans antialiased selection:bg-orange-500 selection:text-white">
+
+  <!-- Top Header -->
+  <header class="bg-white sticky top-0 z-40 border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs">
+    <div id="brandBox"></div>
+    <div class="flex items-center space-x-2">
+      <div class="text-right">
+        <span class="text-[9px] uppercase font-bold text-orange-600 flex items-center justify-end">
+          <i class="fas fa-location-dot mr-1"></i> Delivery Location
+        </span>
+        <p id="locLabel" class="text-xs font-semibold text-slate-700 truncate max-w-[130px]">
+          Detecting GPS...
+        </p>
+      </div>
+      <button id="authTriggerBtn" class="bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-200 text-xs px-3 py-1.5 rounded-xl font-bold flex items-center transition">
+        <i class="fas fa-user mr-1.5"></i> <span id="authBtnLabel">Sign In</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- PWA Install Banner -->
+  <div id="pwaBanner" class="hidden m-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white p-3.5 rounded-2xl shadow-lg flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <img src="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png" class="w-9 h-9 rounded-xl bg-white p-1">
+      <div>
+        <h4 class="font-bold text-sm leading-tight">Install Feasto App</h4>
+        <p class="text-xs text-orange-100">Add to Home Screen for fast ordering</p>
+      </div>
+    </div>
+    <button id="pwaBtn" class="bg-white text-orange-600 text-xs px-3.5 py-1.5 rounded-xl font-black shadow">
+      Install
+    </button>
+  </div>
+
+  <!-- TAB 1: EXPLORE VIEW -->
+  <div id="tabExploreView" class="space-y-4">
+    <!-- Promotional Banners Slider (Published from Admin Panel) -->
+    <section class="px-4 pt-3">
+      <div id="bannerSlider" class="flex space-x-3 overflow-x-auto no-scrollbar scroll-smooth snap-x">
+        <div class="min-w-full h-36 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl flex items-center justify-center text-white p-4 shadow-sm snap-center">
+          <div>
+            <span class="text-xs bg-white/20 px-2 py-0.5 rounded font-mono font-bold uppercase">Welcome</span>
+            <h3 class="text-lg font-black mt-1">Fresh Food Delivered Fast</h3>
+            <p class="text-xs text-orange-100">Add banners directly from Admin Panel</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Category Sub-Tabs -->
+    <section class="px-4">
+      <h3 class="text-xs font-black text-slate-400 tracking-wider uppercase mb-2">Explore Cuisines</h3>
+      <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-1 text-xs font-bold" id="categoryTabs">
+        <button onclick="filterCategory('ALL')" class="cat-pill bg-orange-600 text-white px-3.5 py-2 rounded-xl flex-shrink-0 transition">
+          All
+        </button>
+        <button onclick="filterCategory('Biryani')" class="cat-pill bg-white border border-slate-200 text-slate-700 hover:border-orange-500 px-3.5 py-2 rounded-xl flex-shrink-0 transition">
+          🍗 Biryani
+        </button>
+        <button onclick="filterCategory('Pizza')" class="cat-pill bg-white border border-slate-200 text-slate-700 hover:border-orange-500 px-3.5 py-2 rounded-xl flex-shrink-0 transition">
+          🍕 Pizza
+        </button>
+        <button onclick="filterCategory('Rolls')" class="cat-pill bg-white border border-slate-200 text-slate-700 hover:border-orange-500 px-3.5 py-2 rounded-xl flex-shrink-0 transition">
+          🌯 Rolls
+        </button>
+        <button onclick="filterCategory('Thali')" class="cat-pill bg-white border border-slate-200 text-slate-700 hover:border-orange-500 px-3.5 py-2 rounded-xl flex-shrink-0 transition">
+          🍱 Thali
+        </button>
+      </div>
+    </section>
+
+    <!-- Approved Kitchens Feed -->
+    <main class="p-4 space-y-3">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xs font-black text-slate-900 tracking-wider uppercase">Active Kitchens Near You</h2>
+        <span class="text-[11px] text-slate-400" id="restCountLabel">0 Kitchens</span>
+      </div>
+      <div id="restList" class="space-y-3">
+        <div class="text-center py-8 text-xs text-slate-400">Loading restaurants...</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- TAB 2: MY ORDERS & LIVE TRACKING VIEW -->
+  <div id="tabOrdersView" class="hidden p-4 space-y-4">
+    <div class="flex justify-between items-center border-b pb-3">
+      <div>
+        <h2 class="text-lg font-black text-slate-900">Your Active Order</h2>
+        <p class="text-xs text-slate-500">Live order status and delivery tracking</p>
+      </div>
+      <span class="w-3 h-3 bg-green-500 rounded-full animate-ping"></span>
+    </div>
+
+    <!-- Empty State -->
+    <div id="noActiveOrderBox" class="p-8 bg-white border border-dashed rounded-3xl text-center text-xs text-slate-400 space-y-2">
+      <i class="fas fa-utensils text-2xl text-slate-300"></i>
+      <p>No active order right now.</p>
+      <button onclick="switchTab('explore')" class="text-orange-600 font-bold underline">Order food from Explore</button>
+    </div>
+
+    <!-- Active Tracking Card -->
+    <div id="activeTrackingCard" class="hidden space-y-4">
+      <div id="trackingMap" class="bg-slate-200 flex items-center justify-center text-xs text-slate-500">
+        Live route loading...
+      </div>
+
+      <!-- 4-Digit OTP Box -->
+      <div class="bg-slate-900 text-white p-4 rounded-2xl text-center shadow-md">
+        <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Delivery Verification OTP</span>
+        <div id="custOtp" class="text-3xl font-mono font-black text-orange-400 my-1">----</div>
+        <p class="text-[10px] text-slate-400">Share this code with rider only upon receiving food.</p>
+      </div>
+
+      <div class="bg-orange-50 border border-orange-200 p-4 rounded-2xl">
+        <span class="text-[10px] font-mono font-bold text-orange-600 uppercase">Current Stage</span>
+        <h4 id="trackStatusMsg" class="text-base font-black text-slate-800">Order Placed</h4>
+        <p id="trackSubMsg" class="text-xs text-slate-500 mt-0.5">Waiting for kitchen response...</p>
+      </div>
+
+      <!-- UPI Payment Trigger -->
+      <div id="payUpiBox" class="hidden bg-emerald-50 border border-emerald-200 p-4 rounded-2xl space-y-2">
+        <p class="text-xs font-bold text-emerald-800">Kitchen accepted your order! Pay via UPI:</p>
+        <button id="payWithUpiBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow-md transition">
+          <i class="fas fa-lock mr-2"></i> Pay Through UPI
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION MODAL -->
+  <div id="authModal" class="hidden fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl relative">
+      <button id="closeAuthBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+        <i class="fas fa-xmark text-lg"></i>
+      </button>
+
+      <div class="text-center">
+        <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 text-xl mx-auto mb-2">
+          <i class="fas fa-user"></i>
+        </div>
+        <h3 class="text-lg font-black text-slate-900">Customer Account</h3>
+        <p class="text-xs text-slate-500">Sign in to save address and order food</p>
+      </div>
+
+      <form id="authForm" class="space-y-3">
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 block mb-1">Your Full Name</label>
+          <input type="text" id="custNameInput" required placeholder="e.g. Rahul Sharma" class="w-full border rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 block mb-1">Phone Number (For Delivery Rider)</label>
+          <input type="tel" id="custPhoneInput" required placeholder="+91 9876543210" class="w-full border rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+        </div>
+        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider shadow-md transition">
+          Save Details
+        </button>
+      </form>
+
+      <div class="relative flex py-1 items-center">
+        <div class="flex-grow border-t border-slate-200"></div>
+        <span class="flex-shrink mx-2 text-[10px] text-slate-400 font-bold uppercase">Or</span>
+        <div class="flex-grow border-t border-slate-200"></div>
+      </div>
+
+      <button id="guestLoginBtn" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
+        Continue as Guest
+      </button>
+    </div>
+  </div>
+
+  <!-- Dishes Menu View Modal -->
+  <div id="menuModal" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex flex-col justify-end">
+    <div class="bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <h3 id="modalRestName" class="text-base font-black text-slate-900">Restaurant Menu</h3>
+          <span id="modalRestDist" class="text-xs text-orange-600 font-bold">-- km away</span>
+        </div>
+        <button id="closeMenuBtn" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+      <div id="dishItemsContainer" class="space-y-3">
+        <!-- Live approved dishes -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout & Non-Refundable Cancellation Disclaimer -->
+  <div id="checkoutModal" class="hidden fixed inset-0 bg-slate-900/70 z-50 flex flex-col justify-end">
+    <div class="bg-white rounded-t-3xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-black text-slate-900">Order Summary & Confirmation</h3>
+        <button id="closeCheckoutBtn" class="text-slate-400 text-lg"><i class="fas fa-xmark"></i></button>
+      </div>
+
+      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs space-y-2">
+        <div class="flex justify-between text-slate-600">
+          <span>Items Subtotal:</span>
+          <span id="billSubtotal" class="font-bold">₹0</span>
+        </div>
+        <div class="flex justify-between text-slate-600">
+          <span>Delivery Fee (<span id="billDistKm">0</span> km tier):</span>
+          <span id="billDeliveryFee" class="font-bold">₹20</span>
+        </div>
+        <div class="flex justify-between text-slate-600">
+          <span>Platform Fee:</span>
+          <span class="font-bold">₹5</span>
+        </div>
+        <div class="flex justify-between text-slate-900 font-black text-sm pt-2 border-t">
+          <span>Grand Total:</span>
+          <span id="billTotal" class="text-orange-600">₹0</span>
+        </div>
+      </div>
+
+      <!-- Payment Alert -->
+      <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-900 space-y-1">
+        <div class="font-bold flex items-center"><i class="fas fa-circle-exclamation mr-1.5"></i> Payment Options:</div>
+        <p>● Pay online through <strong>UPI</strong> after kitchen accepts order.</p>
+        <p class="text-rose-600 font-bold">● Cash on delivery is NOT available at this moment.</p>
+      </div>
+
+      <!-- Strict Non-Refundable Checkbox -->
+      <div class="bg-rose-50 border-2 border-rose-200 p-3.5 rounded-2xl">
+        <label class="flex items-start space-x-2.5 cursor-pointer">
+          <input type="checkbox" id="disclaimerCheckbox" class="mt-0.5 h-4 w-4 rounded border-rose-300 text-rose-600 focus:ring-rose-500">
+          <span class="text-[11px] leading-tight text-rose-900 font-bold">
+            I understand that if I order any item I CANNOT cancel it. And if I cannot answer the call in 2-3 times, my order will cancel automatically and I will NOT be refunded.
+          </span>
+        </label>
+      </div>
+
+      <button id="confirmOrderBtn" disabled class="w-full bg-slate-300 text-slate-500 font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider transition">
+        Accept Terms & Place Order
+      </button>
+    </div>
+  </div>
+
+  <!-- Sticky Bottom Cart Bar -->
+  <div id="cartBar" class="hidden fixed bottom-16 left-4 right-4 bg-orange-600 text-white p-3.5 rounded-2xl shadow-xl z-30 flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <span id="cartCountBadge" class="bg-orange-900 text-white px-2 py-0.5 rounded-md text-xs font-black">0</span>
+      <span id="cartTotalLabel" class="text-xs font-bold">₹0</span>
+    </div>
+    <button id="openCheckoutBtn" class="bg-white text-orange-600 font-black text-xs px-4 py-2 rounded-xl">
+      Continue <i class="fas fa-arrow-right ml-1"></i>
+    </button>
+  </div>
+
+  <!-- INTERLINKED BOTTOM NAVIGATION BAR -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-2 flex justify-around items-center z-40 shadow-lg">
+    <button onclick="switchTab('explore')" id="navExploreBtn" class="text-orange-600 flex flex-col items-center flex-1">
+      <i class="fas fa-utensils text-lg"></i>
+      <span class="text-[9px] font-bold mt-0.5">Explore</span>
+    </button>
+    <button onclick="switchTab('orders')" id="navOrdersBtn" class="text-slate-400 hover:text-slate-600 flex flex-col items-center flex-1">
+      <i class="fas fa-clock-rotate-left text-lg"></i>
+      <span class="text-[9px] font-bold mt-0.5">Orders</span>
+    </button>
+    <a href="restaurant.html" class="text-slate-400 hover:text-slate-600 flex flex-col items-center flex-1">
+      <i class="fas fa-store text-lg"></i>
+      <span class="text-[9px] font-bold mt-0.5">Kitchen</span>
+    </a>
+    <a href="delivery.html" class="text-slate-400 hover:text-slate-600 flex flex-col items-center flex-1">
+      <i class="fas fa-person-biking text-lg"></i>
+      <span class="text-[9px] font-bold mt-0.5">Rider</span>
+    </a>
+    <a href="admin.html" class="text-slate-400 hover:text-slate-600 flex flex-col items-center flex-1">
+      <i class="fas fa-shield-halved text-lg"></i>
+      <span class="text-[9px] font-bold mt-0.5">Admin</span>
+    </a>
+  </nav>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+    import { getFirestore, collection, doc, query, where, onSnapshot, addDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+    import { CONFIG, BRAND_LOGO_HTML } from "./config.js";
+
+    document.getElementById("brandBox").innerHTML = BRAND_LOGO_HTML;
+
+    // Initialize Firebase with your actual credentials
+    const app = initializeApp(CONFIG.firebase);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    signInAnonymously(auth).catch(console.error);
+
+    let userCoords = { lat: 28.6139, lng: 77.2090 };
+    let selectedRest = null;
+    let cart = [];
+    let activeOrderId = localStorage.getItem("feasto_active_order");
+    let allRestaurants = [];
+
+    // --- AUTHENTICATION POPUP & PROFILE MANAGEMENT ---
+    let customerUser = JSON.parse(localStorage.getItem("feasto_customer_user")) || null;
+    updateAuthUI();
+
+    function updateAuthUI() {
+      const label = document.getElementById("authBtnLabel");
+      if (customerUser) {
+        label.innerText = customerUser.name.split(" ")[0];
+      } else {
+        label.innerText = "Sign In";
+      }
+    }
+
+    const authModal = document.getElementById("authModal");
+    document.getElementById("authTriggerBtn").onclick = () => {
+      if (customerUser) {
+        if (confirm(`Logged in as ${customerUser.name} (${customerUser.phone}). Do you want to Sign Out?`)) {
+          localStorage.removeItem("feasto_customer_user");
+          customerUser = null;
+          updateAuthUI();
+        }
+      } else {
+        authModal.classList.remove("hidden");
+      }
+    };
+    document.getElementById("closeAuthBtn").onclick = () => authModal.classList.add("hidden");
+
+    document.getElementById("authForm").onsubmit = (e) => {
+      e.preventDefault();
+      const name = document.getElementById("custNameInput").value.trim();
+      const phone = document.getElementById("custPhoneInput").value.trim();
+      customerUser = { name, phone, id: "CUST_" + Date.now().toString().slice(-4) };
+      localStorage.setItem("feasto_customer_user", JSON.stringify(customerUser));
+      updateAuthUI();
+      authModal.classList.add("hidden");
+      alert(`Welcome, ${name}!`);
+    };
+
+    document.getElementById("guestLoginBtn").onclick = () => {
+      customerUser = { name: "Guest User", phone: "+91 9999999999", id: "GUEST" };
+      localStorage.setItem("feasto_customer_user", JSON.stringify(customerUser));
+      updateAuthUI();
+      authModal.classList.add("hidden");
+    };
+
+    // --- SUB-TABS SWITCHER (EXPLORE vs ORDERS) ---
+    window.switchTab = (tab) => {
+      const exploreView = document.getElementById("tabExploreView");
+      const ordersView = document.getElementById("tabOrdersView");
+      const navExplore = document.getElementById("navExploreBtn");
+      const navOrders = document.getElementById("navOrdersBtn");
+
+      if (tab === "explore") {
+        exploreView.classList.remove("hidden");
+        ordersView.classList.add("hidden");
+        navExplore.className = "text-orange-600 flex flex-col items-center flex-1";
+        navOrders.className = "text-slate-400 hover:text-slate-600 flex flex-col items-center flex-1";
+      } else {
+        exploreView.classList.add("hidden");
+        ordersView.classList.remove("hidden");
+        navOrders.className = "text-orange-600 flex flex-col items-center flex-1";
+        navExplore.className = "text-slate-400 hover:text-slate-600 flex flex-col items-center flex-1";
+
+        if (activeOrderId) {
+          document.getElementById("noActiveOrderBox").classList.add("hidden");
+          document.getElementById("activeTrackingCard").classList.remove("hidden");
+          listenOrderUpdates(activeOrderId);
+        } else {
+          document.getElementById("noActiveOrderBox").classList.remove("hidden");
+          document.getElementById("activeTrackingCard").classList.add("hidden");
+        }
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // --- CATEGORY FILTER TABS ---
+    window.filterCategory = (cat) => {
+      document.querySelectorAll(".cat-pill").forEach(p => {
+        p.className = "cat-pill bg-white border border-slate-200 text-slate-700 hover:border-orange-500 px-3.5 py-2 rounded-xl flex-shrink-0 transition";
+      });
+      event.target.className = "cat-pill bg-orange-600 text-white px-3.5 py-2 rounded-xl flex-shrink-0 transition";
+
+      const filtered = cat === "ALL" 
+        ? allRestaurants 
+        : allRestaurants.filter(r => (r.cuisine || "").toLowerCase().includes(cat.toLowerCase()));
+      renderRestaurants(filtered);
+    };
+
+    // Geolocation detection
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        document.getElementById("locLabel").innerText = `${userCoords.lat.toFixed(2)}, ${userCoords.lng.toFixed(2)}`;
+      }, () => {
+        document.getElementById("locLabel").innerText = "Delhi NCR";
+      });
+    }
+
+    // PWA Install prompt
+    let deferredPrompt;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById("pwaBanner").classList.remove("hidden");
+    });
+    document.getElementById("pwaBtn").onclick = () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        document.getElementById("pwaBanner").classList.add("hidden");
+      }
+    };
+
+    // Listen for Approved Kitchens
+    onSnapshot(query(collection(db, "restaurants"), where("status", "==", "APPROVED")), (snap) => {
+      allRestaurants = [];
+      snap.forEach(d => allRestaurants.push({ id: d.id, ...d.data() }));
+      document.getElementById("restCountLabel").innerText = `${allRestaurants.length} Kitchens`;
+      renderRestaurants(allRestaurants);
+    });
+
+    // Listen for Banners
+    onSnapshot(collection(db, "banners"), (snap) => {
+      const slider = document.getElementById("bannerSlider");
+      if (snap.empty) return;
+      slider.innerHTML = "";
+      snap.forEach(d => {
+        const b = d.data();
+        slider.innerHTML += `
+          <div class="min-w-full h-36 rounded-2xl overflow-hidden relative shadow-sm snap-center flex-shrink-0">
+            <img src="${b.imageUrl}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-3">
+              <span class="text-white font-black text-xs">${b.title || 'Featured'}</span>
+            </div>
+          </div>`;
+      });
+    });
+
+    function renderRestaurants(list) {
+      const container = document.getElementById("restList");
+      container.innerHTML = "";
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div class="p-6 bg-white rounded-2xl border text-center text-xs text-slate-400">No restaurants found in this category.</div>`;
+        return;
+      }
+
+      list.forEach(r => {
+        const dist = CONFIG.getDistanceKm(userCoords.lat, userCoords.lng, r.lat || 28.61, r.lng || 77.20);
+        const card = document.createElement("div");
+        card.className = "bg-white p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-xs";
+        card.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 font-black">
+              ${r.name.charAt(0)}
+            </div>
+            <div>
+              <h4 class="font-bold text-xs text-slate-900">${r.name}</h4>
+              <p class="text-[11px] text-slate-500">${r.cuisine || 'Multi-Cuisine'} &bull; <span class="text-orange-600 font-semibold">${dist} km</span></p>
+            </div>
+          </div>
+          <button class="bg-orange-50 text-orange-600 text-xs px-3 py-1.5 rounded-xl font-bold">View Menu</button>
+        `;
+        card.onclick = () => openRestaurantMenu(r.id, r, dist);
+        container.appendChild(card);
+      });
+    }
+
+    // Open Restaurant Menu
+    function openRestaurantMenu(restId, restData, dist) {
+      selectedRest = { id: restId, ...restData, distanceKm: dist };
+      document.getElementById("modalRestName").innerText = restData.name;
+      document.getElementById("modalRestDist").innerText = `${dist} km away`;
+      document.getElementById("menuModal").classList.remove("hidden");
+
+      onSnapshot(query(collection(db, "dishes"), where("restaurantId", "==", restId), where("status", "==", "APPROVED")), (snap) => {
+        const dishBox = document.getElementById("dishItemsContainer");
+        dishBox.innerHTML = "";
+        if (snap.empty) {
+          dishBox.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">No approved dishes yet for this restaurant.</div>`;
+          return;
+        }
+        snap.forEach(dishSnap => {
+          const dish = dishSnap.data();
+          const card = document.createElement("div");
+          card.className = "bg-white p-3 border border-slate-200 rounded-2xl flex items-center justify-between";
+          card.innerHTML = `
+            <div class="flex items-center space-x-3">
+              <img src="${dish.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100'}" class="w-12 h-12 object-cover rounded-xl" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100'">
+              <div>
+                <h5 class="text-xs font-bold text-slate-800">${dish.name}</h5>
+                <span class="text-xs font-black text-slate-900">₹${dish.price}</span>
+              </div>
+            </div>
+            <button id="add-${dishSnap.id}" class="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl">ADD</button>
+          `;
+          card.querySelector(`#add-${dishSnap.id}`).onclick = () => {
+            cart.push({ id: dishSnap.id, name: dish.name, price: Number(dish.price) });
+            updateCart();
+          };
+          dishBox.appendChild(card);
+        });
+      });
+    }
+
+    document.getElementById("closeMenuBtn").onclick = () => document.getElementById("menuModal").classList.add("hidden");
+
+    function updateCart() {
+      const cartBar = document.getElementById("cartBar");
+      if (cart.length > 0) {
+        cartBar.classList.remove("hidden");
+        document.getElementById("cartCountBadge").innerText = cart.length;
+        const subtotal = cart.reduce((a, b) => a + b.price, 0);
+        document.getElementById("cartTotalLabel").innerText = `₹${subtotal}`;
+      } else {
+        cartBar.classList.add("hidden");
+      }
+    }
+
+    // Checkout Sheet
+    document.getElementById("openCheckoutBtn").onclick = () => {
+      if (!customerUser) {
+        authModal.classList.remove("hidden");
+        return;
+      }
+      document.getElementById("menuModal").classList.add("hidden");
+      document.getElementById("checkoutModal").classList.remove("hidden");
+
+      const subtotal = cart.reduce((a, b) => a + b.price, 0);
+      const dist = selectedRest.distanceKm || 1.5;
+      const deliveryFee = CONFIG.calculateDeliveryFee(dist);
+      const total = subtotal + deliveryFee + CONFIG.app.platformFee;
+
+      document.getElementById("billSubtotal").innerText = `₹${subtotal}`;
+      document.getElementById("billDistKm").innerText = dist;
+      document.getElementById("billDeliveryFee").innerText = `₹${deliveryFee}`;
+      document.getElementById("billTotal").innerText = `₹${total}`;
+    };
+
+    document.getElementById("closeCheckoutBtn").onclick = () => document.getElementById("checkoutModal").classList.add("hidden");
+
+    const disclaimerBox = document.getElementById("disclaimerCheckbox");
+    const confirmBtn = document.getElementById("confirmOrderBtn");
+    disclaimerBox.onchange = () => {
+      if (disclaimerBox.checked) {
+        confirmBtn.disabled = false;
+        confirmBtn.className = "w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg transition";
+      } else {
+        confirmBtn.disabled = true;
+        confirmBtn.className = "w-full bg-slate-300 text-slate-500 font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider transition";
+      }
+    };
+
+    // Place Order
+    confirmBtn.onclick = async () => {
+      const subtotal = cart.reduce((a, b) => a + b.price, 0);
+      const dist = selectedRest.distanceKm || 1.5;
+      const deliveryFee = CONFIG.calculateDeliveryFee(dist);
+      const grandTotal = subtotal + deliveryFee + CONFIG.app.platformFee;
+      const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+      const orderRef = await addDoc(collection(db, "orders"), {
+        customerId: customerUser.id,
+        customerName: customerUser.name,
+        customerPhone: customerUser.phone,
+        restaurantId: selectedRest.id,
+        restaurantName: selectedRest.name,
+        items: cart,
+        subtotal: subtotal,
+        distanceKm: dist,
+        deliveryFee: deliveryFee,
+        platformFee: CONFIG.app.platformFee,
+        totalAmount: grandTotal,
+        otp: otpCode,
+        status: "CREATED",
+        paymentStatus: "PENDING",
+        customerLocation: userCoords,
+        createdAt: serverTimestamp()
+      });
+
+      cart = [];
+      updateCart();
+      document.getElementById("checkoutModal").classList.add("hidden");
+      activeOrderId = orderRef.id;
+      localStorage.setItem("feasto_active_order", activeOrderId);
+      switchTab("orders");
+    };
+
+    // Live Order Listener
+    function listenOrderUpdates(orderId) {
+      onSnapshot(doc(db, "orders", orderId), (snap) => {
+        if (!snap.exists()) return;
+        const o = snap.data();
+        document.getElementById("custOtp").innerText = o.otp;
+        document.getElementById("trackStatusMsg").innerText = o.status.replace(/_/g, " ");
+
+        if (o.status === "RESTAURANT_ACCEPTED" && o.paymentStatus === "PENDING") {
+          document.getElementById("payUpiBox").classList.remove("hidden");
+          document.getElementById("trackSubMsg").innerText = "Kitchen accepted! Complete UPI payment.";
+          setupRazorpay(o);
+        } else if (o.status === "PAYMENT_CONFIRMED" || o.status === "PREPARING") {
+          document.getElementById("payUpiBox").classList.add("hidden");
+          document.getElementById("trackSubMsg").innerText = "Payment confirmed! Food is cooking.";
+        } else if (o.status === "OUT_FOR_DELIVERY") {
+          document.getElementById("trackSubMsg").innerText = "Rider picked up food and is on the way!";
+        } else if (o.status === "DELIVERED") {
+          document.getElementById("trackSubMsg").innerText = "Delivered! Enjoy your meal.";
+          localStorage.removeItem("feasto_active_order");
+        }
+      });
+    }
+
+    function setupRazorpay(order) {
+      document.getElementById("payWithUpiBtn").onclick = () => {
+        const rzp = new window.Razorpay({
+          key: CONFIG.razorpayKeyId,
+          amount: order.totalAmount * 100,
+          currency: "INR",
+          name: CONFIG.app.name,
+          description: "Online Food Delivery",
+          handler: async () => {
+            await updateDoc(doc(db, "orders", activeOrderId), {
+              paymentStatus: "SUCCESS",
+              status: "PAYMENT_CONFIRMED"
+            });
+          },
+          theme: { color: "#EA580C" }
+        });
+        rzp.open();
+      };
+    }
+
+    // Auto-resume active order if one exists
+    if (activeOrderId) {
+      listenOrderUpdates(activeOrderId);
+    }
+  </script>
+</body>
+</html>
