@@ -1,6 +1,0 @@
-# Allow direct access to each independent panel
-/customer     /customer.html   200
-/restaurant   /restaurant.html 200
-/delivery     /delivery.html   200
-/admin        /admin.html      200
-/*            /index.html      200
