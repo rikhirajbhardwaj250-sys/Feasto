@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Feasto - Rider Partner</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <link rel="apple-touch-icon" href="https://i.supaimg.com/0102605e-3d7b-40fe-b036-ff43cacb268e/02c8568f-70bc-4207-aeb1-887bbf212b73.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .pb-safe { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+  </style>
+</head>
+<body class="bg-slate-900 text-white min-h-screen font-sans flex flex-col justify-between pb-safe">
+
+  <!-- Rider Header -->
+  <header class="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+    <div id="riderBrand"></div>
+    <div class="flex items-center space-x-2">
+      <span id="dutyText" class="text-xs font-bold text-slate-400">Offline</span>
+      <input type="checkbox" id="dutyToggle" class="w-5 h-5 accent-emerald-500 rounded cursor-pointer">
+    </div>
+  </header>
+
+  <main class="p-4 flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+    <!-- Offline Notice -->
+    <div id="offlineNotice" class="text-center space-y-3">
+      <i class="fas fa-motorcycle text-4xl text-slate-600"></i>
+      <h3 class="text-lg font-bold">You are currently Offline</h3>
+      <p class="text-xs text-slate-400">Toggle switch above to receive delivery runs.</p>
+    </div>
+
+    <!-- Active Job Card -->
+    <div id="activeJobCard" class="hidden bg-slate-800 border-2 border-orange-500 rounded-3xl p-5 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <span class="bg-orange-500/20 text-orange-400 text-[10px] font-mono font-bold px-2 py-1 rounded">DELIVERY ASSIGNED</span>
+        <span id="jobOrderId" class="text-xs font-mono text-slate-400">#ORD</span>
+      </div>
+
+      <!-- Distance & Formula Matrix Payout -->
+      <div class="grid grid-cols-2 gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-700">
+        <div>
+          <span class="text-[10px] text-slate-400 uppercase font-bold block">Distance</span>
+          <span id="jobDistance" class="text-sm font-black text-white">0 km</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-emerald-400 uppercase font-bold block">Your Payout</span>
+          <span id="jobPayout" class="text-base font-black text-emerald-400">₹20</span>
+        </div>
+      </div>
+
+      <!-- Customer Phone Number Link -->
+      <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-700/60 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] text-slate-400 block">Customer Phone</span>
+          <a id="custPhoneLink" href="#" class="text-xs font-bold text-orange-400 underline">+91 9876543210</a>
+        </div>
+        <a id="callBtn" href="#" class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white">
+          <i class="fas fa-phone text-xs"></i>
+        </a>
+      </div>
+
+      <!-- Food Pickup Confirmation -->
+      <div id="actionPickBox">
+        <button id="btnConfirmPickup" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-xs transition">
+          CONFIRM FOOD PICKUP
+        </button>
+      </div>
+
+      <!-- 4-Digit OTP Entry -->
+      <div id="actionOtpBox" class="hidden space-y-3">
+        <label class="text-xs font-bold text-slate-300 block text-center">Enter Customer's 4-Digit Delivery OTP</label>
+        <input type="text" id="riderOtpInput" maxlength="4" placeholder="----" class="w-full bg-slate-900 border border-slate-700 text-center font-mono text-2xl tracking-widest text-orange-400 py-2.5 rounded-xl focus:outline-none">
+        <button id="btnCompleteDelivery" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider">
+          Verify OTP & Mark Delivered
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Interlinked Bottom Navigation -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 px-4 py-2 flex justify-around items-center z-40 shadow-lg">
+    <a href="customer.html" class="text-slate-500 hover:text-white flex flex-col items-center flex-1">
+      <i class="fas fa-utensils text-lg"></i>
+      <span class="text-[9px] font-bold mt-0.5">Customer</span>
+    </a>
+    <a href="restaurant.html" class="text-slate-500 hover:text-white flex flex-col items-center flex-1">
+      <i class="fas fa-store text-lg"></i>
+      <span class="text-[9px] font-bold mt-0.5">Kitchen</span>
+    </a>
+    <a href="delivery.html" class="text-blue-400 flex flex-col items-center flex-1">
+      <i class="fas fa-person-biking text-lg"></i>
+      <span class="text-[9px] font-bold mt-0.5">Rider</span>
+    </a>
+    <a href="admin.html" class="text-slate-500 hover:text-white flex flex-col items-center flex-1">
+      <i class="fas fa-shield-halved text-lg"></i>
+      <span class="text-[9px] font-bold mt-0.5">Admin</span>
+    </a>
+  </nav>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, updateDoc, onSnapshot, query, collection, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+    import { CONFIG, BRAND_LOGO_HTML } from "./config.js";
+
+    document.getElementById("riderBrand").innerHTML = BRAND_LOGO_HTML;
+
+    const app = initializeApp(CONFIG.firebase);
+    const db = getFirestore(app);
+
+    const riderId = "RIDER_1";
+    let watchId, activeJob;
+
+    document.getElementById("dutyToggle").onchange = (e) => {
+      const isOnline = e.target.checked;
+      document.getElementById("dutyText").innerText = isOnline ? "Online" : "Offline";
+      document.getElementById("dutyText").className = isOnline ? "text-xs font-bold text-emerald-400" : "text-xs font-bold text-slate-400";
+
+      if (isOnline) {
+        document.getElementById("offlineNotice").classList.add("hidden");
+        listenJobs();
+        if (navigator.geolocation) {
+          watchId = navigator.geolocation.watchPosition(pos => {
+            setDoc(doc(db, "activeLocations", riderId), {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              updatedAt: serverTimestamp()
+            }, { merge: true });
+          });
+        }
+      } else {
+        document.getElementById("offlineNotice").classList.remove("hidden");
+        document.getElementById("activeJobCard").classList.add("hidden");
+        if (watchId) navigator.geolocation.clearWatch(watchId);
+      }
+    };
+
+    function listenJobs() {
+      const q = query(collection(db, "orders"), where("status", "in", ["READY_FOR_PICKUP", "OUT_FOR_DELIVERY"]));
+      onSnapshot(q, (snap) => {
+        if (snap.empty) {
+          document.getElementById("activeJobCard").classList.add("hidden");
+          return;
+        }
+        const d = snap.docs[0];
+        activeJob = { id: d.id, ...d.data() };
+
+        document.getElementById("activeJobCard").classList.remove("hidden");
+        document.getElementById("jobOrderId").innerText = `#${activeJob.id.substring(0,6)}`;
+
+        const dist = activeJob.distanceKm || 1.5;
+        const payout = CONFIG.calculateRiderPayout(dist);
+        document.getElementById("jobDistance").innerText = `${dist} km`;
+        document.getElementById("jobPayout").innerText = `₹${payout}`;
+
+        const phone = activeJob.customerPhone || "+91 9876543210";
+        document.getElementById("custPhoneLink").innerText = phone;
+        document.getElementById("custPhoneLink").href = `tel:${phone}`;
+        document.getElementById("callBtn").href = `tel:${phone}`;
+
+        if (activeJob.status === "READY_FOR_PICKUP") {
+          document.getElementById("actionPickBox").classList.remove("hidden");
+          document.getElementById("actionOtpBox").classList.add("hidden");
+        } else {
+          document.getElementById("actionPickBox").classList.add("hidden");
+          document.getElementById("actionOtpBox").classList.remove("hidden");
+        }
+      });
+    }
+
+    document.getElementById("btnConfirmPickup").onclick = async () => {
+      await updateDoc(doc(db, "orders", activeJob.id), {
+        status: "OUT_FOR_DELIVERY",
+        deliveryPartnerId: riderId
+      });
+    };
+
+    document.getElementById("btnCompleteDelivery").onclick = async () => {
+      const enteredOtp = document.getElementById("riderOtpInput").value.trim();
+      if (enteredOtp === activeJob.otp) {
+        await updateDoc(doc(db, "orders", activeJob.id), {
+          status: "DELIVERED"
+        });
+        alert("Delivery verified and completed! Payout added to wallet.");
+        document.getElementById("riderOtpInput").value = "";
+      } else {
+        alert("Invalid OTP! Ask the customer to read it from their tracking screen.");
+      }
+    };
+  </script>
+</body>
+</html>
